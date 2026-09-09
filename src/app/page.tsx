@@ -24,6 +24,8 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { StoryTimeline } from "@/components/story-timeline";
 import { PartnerMarquee } from "@/components/partner-marquee";
 import { MealsShowcase } from "@/components/meals-showcase";
+import { RingStat } from "@/components/ring-stat";
+import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,16 +70,13 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative">
+    <div className="dark relative bg-background text-foreground">
       <ScrollProgress />
 
       {/* Nav propio del sitio de la empresa */}
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-            <span aria-hidden>💪</span>
-            <span>NutriDemo</span>
-          </div>
+          <BrandMark compact />
           <nav className="hidden items-center gap-1 rounded-lg bg-muted p-1 sm:flex">
             <Link href="/tienda">
               <Button variant="ghost" size="sm" className="gap-2">
@@ -108,12 +107,17 @@ export default function HomePage() {
       </header>
 
       {/* Hero — pantalla completa; nada de la siguiente sección se asoma
-          hasta que se hace scroll. */}
+          hasta que se hace scroll. Fondo oscuro con textura de chevrones y
+          un resplandor verde, en la línea del empaque de referencia. */}
       <section
         ref={heroRef}
-        className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden"
+        className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden bg-background"
       >
-        <div className="absolute inset-0 -z-10 bg-linear-to-br from-green-50 via-background to-emerald-100" />
+        <div className="chevron-texture absolute inset-0 -z-20" />
+        <div
+          className="absolute top-1/2 left-1/2 -z-10 h-144 w-144 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[120px]"
+          aria-hidden
+        />
         <motion.span
           aria-hidden
           className="pointer-events-none absolute top-24 left-[8%] text-6xl opacity-70 sm:text-7xl"
@@ -148,7 +152,7 @@ export default function HomePage() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-semibold tracking-wide text-primary"
           >
             <Sparkles className="size-3.5" />
             Un mismo inventario, dos canales
@@ -159,7 +163,7 @@ export default function HomePage() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl font-extrabold tracking-tight sm:text-6xl"
+            className="text-4xl font-extrabold tracking-tight uppercase sm:text-6xl"
           >
             Nutrición y fuerza,
             <br />
@@ -210,20 +214,11 @@ export default function HomePage() {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-6 flex flex-wrap items-center justify-center gap-8 text-sm"
+            className="mt-8 flex flex-wrap items-center justify-center gap-10"
           >
-            <div>
-              <p className="text-2xl font-extrabold text-primary">{state.products.length}</p>
-              <p className="text-muted-foreground">productos</p>
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-primary">1</p>
-              <p className="text-muted-foreground">inventario</p>
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-primary">2</p>
-              <p className="text-muted-foreground">canales de venta</p>
-            </div>
+            <RingStat value={String(state.products.length)} label="Productos" percent={80} delay={0} />
+            <RingStat value="1" label="Inventario" percent={100} delay={0.15} />
+            <RingStat value="2" label="Canales" percent={55} delay={0.3} />
           </motion.div>
         </motion.div>
       </section>
@@ -240,7 +235,7 @@ export default function HomePage() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-16 max-w-2xl text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Nuestra historia</h2>
+          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Nuestra historia</h2>
           <p className="mt-3 text-muted-foreground">
             De una servilleta garabateada a un solo cerebro de inventario para todos
             nuestros canales de venta.
@@ -260,7 +255,7 @@ export default function HomePage() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-12 max-w-2xl text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
             Gimnasios y tiendas que confían en nosotros
           </h2>
           <p className="mt-3 text-muted-foreground">
@@ -282,7 +277,7 @@ export default function HomePage() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-12 max-w-2xl text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Contacto</h2>
+          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Contacto</h2>
           <p className="mt-3 text-muted-foreground">
             ¿Quieres llevar NutriDemo a tu gimnasio o tienda? Escríbenos.
           </p>
@@ -357,12 +352,9 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t px-4 py-10">
+      <footer className="border-t border-border px-4 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex items-center gap-2 font-semibold">
-            <span aria-hidden>💪</span>
-            <span>NutriDemo</span>
-          </div>
+          <BrandMark compact />
           <nav className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/tienda" className="hover:text-foreground">
               Tienda

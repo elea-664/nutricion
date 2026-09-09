@@ -83,25 +83,32 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/*
+ * Tema oscuro — usado únicamente por la landing ("/"), envuelta en una
+ * clase `dark` local (ver page.tsx). Inspirado en el empaque ATHL8: negro
+ * verdoso muy oscuro con un verde brillante como acento, en vez del gris
+ * neutro genérico. No afecta a tienda/POS/admin: esas rutas nunca aplican
+ * la clase `dark`.
+ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.15 0.02 152);
+  --foreground: oklch(0.97 0.01 140);
+  --card: oklch(0.2 0.025 152);
+  --card-foreground: oklch(0.97 0.01 140);
+  --popover: oklch(0.19 0.025 152);
+  --popover-foreground: oklch(0.97 0.01 140);
+  --primary: oklch(0.8 0.19 149);
+  --primary-foreground: oklch(0.16 0.03 152);
+  --secondary: oklch(0.26 0.025 152);
+  --secondary-foreground: oklch(0.97 0.01 140);
+  --muted: oklch(0.24 0.02 152);
+  --muted-foreground: oklch(0.68 0.03 140);
+  --accent: oklch(0.27 0.03 150);
+  --accent-foreground: oklch(0.97 0.01 140);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.8 0.19 149);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -146,4 +153,16 @@
   .animate-marquee {
     animation: none;
   }
+}
+
+/* Textura de chevrones diagonales del empaque ATHL8, reutilizada como fondo
+   sutil en la landing (hero + panel de comidas). */
+.chevron-texture {
+  background-image: repeating-linear-gradient(
+    115deg,
+    color-mix(in oklch, var(--foreground) 5%, transparent) 0px,
+    color-mix(in oklch, var(--foreground) 5%, transparent) 2px,
+    transparent 2px,
+    transparent 34px
+  );
 }

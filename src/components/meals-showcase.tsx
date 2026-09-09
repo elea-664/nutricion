@@ -42,7 +42,7 @@ export function MealsShowcase() {
   if (meals.length === 0) return null;
 
   return (
-    <section className="border-t bg-[rgb(45,57,29)] px-4 py-24 text-primary-foreground">
+    <section className="chevron-texture relative border-t border-border bg-card/60 px-4 py-24 text-foreground">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -51,21 +51,21 @@ export function MealsShowcase() {
         className="mx-auto mb-10 flex max-w-6xl flex-col items-start justify-between gap-6 sm:flex-row sm:items-end"
       >
         <div>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
             Comidas que suman. 🥗
             <br />
             Resultados que se notan.
           </h2>
-          <p className="mt-3 max-w-md text-primary-foreground/80">
+          <p className="mt-3 max-w-md text-muted-foreground">
             Platillos preparados, listos en minutos, con sus macros a la vista.{" "}
-            <span className="inline-flex items-center gap-1 font-medium">
+            <span className="inline-flex items-center gap-1 font-medium text-foreground">
               <Wifi className="size-4" />
               Exclusivos de la tienda en línea.
             </span>
           </p>
         </div>
         <Link href="/tienda?categoria=Comidas">
-          <Button size="lg" className="gap-2 bg-lime-300 text-emerald-950 hover:bg-lime-200">
+          <Button size="lg" className="gap-2">
             Explorar comidas
             <ArrowRight className="size-4" />
           </Button>
@@ -81,8 +81,8 @@ export function MealsShowcase() {
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
               activeTag === tag
-                ? "border-primary-foreground bg-primary-foreground text-primary"
-                : "border-primary-foreground/30 text-primary-foreground/80 hover:border-primary-foreground/60"
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
             )}
           >
             {tag}
@@ -94,7 +94,7 @@ export function MealsShowcase() {
         {visible.map((meal) => (
           <div
             key={meal.id}
-            className="overflow-hidden rounded-2xl bg-background text-foreground shadow-lg"
+            className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-lg"
           >
             <ProductPhoto
               query={meal.photoQuery}
