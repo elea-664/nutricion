@@ -177,7 +177,7 @@ export default function HomePage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-xl text-lg text-muted-foreground"
           >
-            NutriDemo vende suplementos y nutrición deportiva en tienda en línea y en
+            ATHL8 vende suplementos y nutrición deportiva en tienda en línea y en
             mostrador físico — con un solo inventario detrás de los dos. Vende en un canal
             y el stock del otro baja al instante.
           </motion.p>
@@ -279,7 +279,7 @@ export default function HomePage() {
         >
           <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Contacto</h2>
           <p className="mt-3 text-muted-foreground">
-            ¿Quieres llevar NutriDemo a tu gimnasio o tienda? Escríbenos.
+            ¿Quieres llevar ATHL8 a tu gimnasio o tienda? Escríbenos.
           </p>
         </motion.div>
 
@@ -296,7 +296,7 @@ export default function HomePage() {
               <Mail className="size-5 shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-semibold">Correo</p>
-                <p className="text-sm text-muted-foreground">hola@nutridemo.mx</p>
+                <p className="text-sm text-muted-foreground">hola@athl8.mx</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
@@ -377,7 +377,7 @@ export default function HomePage() {
               Reiniciar demo
             </button>
           </nav>
-          <p className="text-sm text-muted-foreground">© 2026 NutriDemo — proyecto demo</p>
+          <p className="text-sm text-muted-foreground">© 2026 ATHL8 — proyecto demo</p>
         </div>
       </footer>
     </div>
