@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, RotateCcw, ShoppingCart, Store } from "lucide-react";
+import { LayoutDashboard, RotateCcw, ShoppingCart, Store, Triangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store-context";
 import { toast } from "sonner";
@@ -29,10 +29,10 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-semibold tracking-tight"
+          className="flex items-center gap-1.5 text-lg font-extrabold tracking-widest uppercase"
         >
-          <span aria-hidden>💪</span>
-          <span>NutriDemo</span>
+          <Triangle className="size-4 fill-primary text-primary" strokeWidth={0} />
+          <span>THL8</span>
         </Link>
 
         <nav className="flex items-center gap-1 rounded-lg bg-muted p-1">

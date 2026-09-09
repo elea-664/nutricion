@@ -14,7 +14,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NutriDemo — Tienda + POS con inventario único",
+  title: "ATHL8 — Tienda + POS con inventario único",
   description:
     "Demo interactivo de venta de productos de nutrición en dos canales (tienda online y POS) que comparten un mismo inventario.",
 };
