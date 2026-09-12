@@ -24,6 +24,9 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { StoryTimeline } from "@/components/story-timeline";
 import { PartnerMarquee } from "@/components/partner-marquee";
 import { MealsShowcase } from "@/components/meals-showcase";
+import { GoalsSection } from "@/components/goals-section";
+import { PlanCta } from "@/components/plan-cta";
+import { AthleteEndorsements } from "@/components/athlete-endorsements";
 import { RingStat } from "@/components/ring-stat";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -223,7 +226,13 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      <GoalsSection />
+
       <MealsShowcase />
+
+      <PlanCta />
+
+      <AthleteEndorsements />
 
       {/* Historia */}
       <section className="border-t bg-muted/20 px-4 py-24">
