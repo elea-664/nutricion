@@ -24,6 +24,10 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { StoryTimeline } from "@/components/story-timeline";
 import { PartnerMarquee } from "@/components/partner-marquee";
 import { MealsShowcase } from "@/components/meals-showcase";
+import { GoalsSection } from "@/components/goals-section";
+import { PlanCta } from "@/components/plan-cta";
+import { AthleteEndorsements } from "@/components/athlete-endorsements";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { RingStat } from "@/components/ring-stat";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -223,133 +227,125 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      <MealsShowcase />
+      <ScrollReveal>
+        <GoalsSection />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <MealsShowcase />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <PlanCta />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <AthleteEndorsements />
+      </ScrollReveal>
 
       {/* Historia */}
-      <section className="border-t bg-muted/20 px-4 py-24">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="mx-auto mb-16 max-w-2xl text-center"
-        >
-          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Nuestra historia</h2>
-          <p className="mt-3 text-muted-foreground">
-            De una servilleta garabateada a un solo cerebro de inventario para todos
-            nuestros canales de venta.
-          </p>
-        </motion.div>
-
-        <StoryTimeline />
-      </section>
-
-      {/* Empresas / aliados */}
-      <section className="border-t px-4 py-24">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="mx-auto mb-12 max-w-2xl text-center"
-        >
-          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-            Gimnasios y tiendas que confían en nosotros
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            Asistimos a marcas de fitness y nutrición de toda la ciudad con el mismo
-            motor de inventario que ves en esta demo.
-          </p>
-        </motion.div>
-
-        <PartnerMarquee />
-      </section>
-
-      {/* Contacto */}
-      <section className="border-t bg-muted/20 px-4 py-24">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="mx-auto mb-12 max-w-2xl text-center"
-        >
-          <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Contacto</h2>
-          <p className="mt-3 text-muted-foreground">
-            ¿Quieres llevar ATHL8 a tu gimnasio o tienda? Escríbenos.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mx-auto grid max-w-4xl grid-cols-1 gap-10 md:grid-cols-2"
-        >
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
-              <Mail className="size-5 shrink-0 text-primary" />
-              <div>
-                <p className="text-sm font-semibold">Correo</p>
-                <p className="text-sm text-muted-foreground">hola@athl8.mx</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
-              <Phone className="size-5 shrink-0 text-primary" />
-              <div>
-                <p className="text-sm font-semibold">Teléfono</p>
-                <p className="text-sm text-muted-foreground">+52 55 0000 0000</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
-              <MapPin className="size-5 shrink-0 text-primary" />
-              <div>
-                <p className="text-sm font-semibold">Oficina</p>
-                <p className="text-sm text-muted-foreground">Ciudad de México, México</p>
-              </div>
-            </div>
+      <ScrollReveal>
+        <section className="border-t bg-muted/20 px-4 py-24">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Nuestra historia</h2>
+            <p className="mt-3 text-muted-foreground">
+              De una servilleta garabateada a un solo cerebro de inventario para todos
+              nuestros canales de venta.
+            </p>
           </div>
 
-          <form
-            onSubmit={form.handleSubmit(onSubmitContact)}
-            className="flex flex-col gap-3 rounded-xl border bg-card p-5"
-          >
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="contact-nombre">Nombre</Label>
-              <Input id="contact-nombre" {...form.register("nombre")} />
-              {form.formState.errors.nombre && (
-                <p className="text-xs text-destructive">{form.formState.errors.nombre.message}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="contact-correo">Correo</Label>
-              <Input id="contact-correo" type="email" {...form.register("correo")} />
-              {form.formState.errors.correo && (
-                <p className="text-xs text-destructive">{form.formState.errors.correo.message}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="contact-mensaje">Mensaje</Label>
-              <Textarea id="contact-mensaje" rows={3} {...form.register("mensaje")} />
-              {form.formState.errors.mensaje && (
-                <p className="text-xs text-destructive">{form.formState.errors.mensaje.message}</p>
-              )}
-            </div>
-            <Button type="submit" className="mt-1 gap-2">
-              Enviar mensaje
-              <ArrowRight className="size-4" />
-            </Button>
-            <p className="text-center text-xs text-muted-foreground">
-              Demo sin backend — el mensaje no se envía a ningún lado.
+          <StoryTimeline />
+        </section>
+      </ScrollReveal>
+
+      {/* Empresas / aliados */}
+      <ScrollReveal>
+        <section className="border-t px-4 py-24">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
+              Gimnasios y tiendas que confían en nosotros
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Asistimos a marcas de fitness y nutrición de toda la ciudad con el mismo
+              motor de inventario que ves en esta demo.
             </p>
-          </form>
-        </motion.div>
-      </section>
+          </div>
+
+          <PartnerMarquee />
+        </section>
+      </ScrollReveal>
+
+      {/* Contacto */}
+      <ScrollReveal>
+        <section className="border-t bg-muted/20 px-4 py-24">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">Contacto</h2>
+            <p className="mt-3 text-muted-foreground">
+              ¿Quieres llevar ATHL8 a tu gimnasio o tienda? Escríbenos.
+            </p>
+          </div>
+
+          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 md:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
+                <Mail className="size-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-semibold">Correo</p>
+                  <p className="text-sm text-muted-foreground">hola@athl8.mx</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
+                <Phone className="size-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-semibold">Teléfono</p>
+                  <p className="text-sm text-muted-foreground">+52 55 0000 0000</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
+                <MapPin className="size-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-semibold">Oficina</p>
+                  <p className="text-sm text-muted-foreground">Ciudad de México, México</p>
+                </div>
+              </div>
+            </div>
+
+            <form
+              onSubmit={form.handleSubmit(onSubmitContact)}
+              className="flex flex-col gap-3 rounded-xl border bg-card p-5"
+            >
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="contact-nombre">Nombre</Label>
+                <Input id="contact-nombre" {...form.register("nombre")} />
+                {form.formState.errors.nombre && (
+                  <p className="text-xs text-destructive">{form.formState.errors.nombre.message}</p>
+                )}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="contact-correo">Correo</Label>
+                <Input id="contact-correo" type="email" {...form.register("correo")} />
+                {form.formState.errors.correo && (
+                  <p className="text-xs text-destructive">{form.formState.errors.correo.message}</p>
+                )}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="contact-mensaje">Mensaje</Label>
+                <Textarea id="contact-mensaje" rows={3} {...form.register("mensaje")} />
+                {form.formState.errors.mensaje && (
+                  <p className="text-xs text-destructive">{form.formState.errors.mensaje.message}</p>
+                )}
+              </div>
+              <Button type="submit" className="mt-1 gap-2">
+                Enviar mensaje
+                <ArrowRight className="size-4" />
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                Demo sin backend — el mensaje no se envía a ningún lado.
+              </p>
+            </form>
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* Footer */}
       <footer className="border-t border-border px-4 py-10">
