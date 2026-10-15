@@ -14,37 +14,37 @@ const MILESTONES: Milestone[] = [
   {
     year: "2019",
     emoji: "💡",
-    title: "Nace la idea",
+    title: "The idea is born",
     description:
-      'Dos entrenadores, hartos de que el mostrador del gym dijera "hay stock" y la tienda en línea dijera "agotado", garabatean el primer diagrama en una servilleta.',
+      'Two coaches, tired of the gym counter saying "in stock" while the online store said "sold out", sketch the first diagram on a napkin.',
   },
   {
     year: "2020",
     emoji: "🧪",
-    title: "Primer piloto",
+    title: "First pilot",
     description:
-      "Probamos la idea en un solo gimnasio: una caja física y una tienda simple compartiendo el mismo inventario. Funcionó mejor de lo esperado.",
+      "We tested the idea in a single gym: one register and a simple online store sharing the same inventory. It worked better than expected.",
   },
   {
     year: "2022",
     emoji: "🔗",
-    title: "Un solo inventario",
+    title: "One single inventory",
     description:
-      "Construimos el motor de fuente única de verdad: cada venta, sin importar el canal, descuenta del mismo stock al instante.",
+      "We built the single-source-of-truth engine: every sale, from any channel, comes out of the same stock instantly.",
   },
   {
     year: "2024",
     emoji: "🤝",
-    title: "Alianzas",
+    title: "Partnerships",
     description:
-      "Gimnasios, boxes y tiendas de nutrición de toda la ciudad empiezan a operar bajo el mismo cerebro de inventario.",
+      "Gyms, boxes and nutrition shops across the city start running on the same inventory brain.",
   },
   {
     year: "2026",
     emoji: "🚀",
-    title: "Hoy",
+    title: "Today",
     description:
-      "Seguimos construyendo: el mismo producto que ves en esta demo, listo para escalar a más canales y sucursales.",
+      "We keep building: the same product you see in this demo, ready to scale to more channels and locations.",
   },
 ];
 

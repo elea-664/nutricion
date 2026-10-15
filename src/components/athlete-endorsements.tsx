@@ -21,32 +21,32 @@ interface Endorsement {
 // esto necesita testimonios, fotos y autorizaciones reales del cliente.
 const ENDORSEMENTS: Endorsement[] = [
   {
-    eyebrow: "Historias reales",
-    title: "Planes aprobados por atletas",
-    name: "Renata Cruz — triatleta amateur",
+    eyebrow: "Real stories",
+    title: "Athlete-approved plans",
+    name: "Renata Cruz — amateur triathlete",
     description:
-      "Renata arma su semana de comidas y suplementos desde el catálogo de ATHL8, sin importar si compra en línea o pasa directo al mostrador del gimnasio.",
-    category: "Comidas",
+      "Renata plans her week of meals and supplements from the ATHL8 catalog, whether she shops online or stops by the store counter.",
+    category: "Meals",
     emoji: "🥗",
     query: "athlete meal prep kitchen",
   },
   {
-    eyebrow: "Alianzas",
-    title: "Impulsando a equipos locales",
-    name: "Club de CrossFit Norte",
+    eyebrow: "Partnerships",
+    title: "Powering local teams",
+    name: "Mesa CrossFit Club",
     description:
-      "El box mantiene su refrigerador surtido con el mismo inventario que ve la tienda en línea — nunca se quedan sin lo que sus atletas necesitan después de entrenar.",
-    category: "Suplementos",
+      "The box keeps its fridge stocked from the same inventory the online store sees — they never run out of what their athletes need after training.",
+    category: "Performance",
     emoji: "🏆",
     query: "gym team group photo",
   },
   {
-    eyebrow: "Rendimiento",
-    title: "Resultados que se notan",
-    name: "Diego Salas — boxeo amateur",
+    eyebrow: "Performance",
+    title: "Results you can see",
+    name: "Diego Salas — amateur boxer",
     description:
-      "Diego confía en la línea de proteína y creatina de ATHL8 para su recuperación entre sesiones de entrenamiento y competencia.",
-    category: "Proteínas",
+      "Diego relies on ATHL8 protein and creatine for recovery between training sessions and competition.",
+    category: "Protein",
     emoji: "🥊",
     query: "boxer training gym portrait",
   },

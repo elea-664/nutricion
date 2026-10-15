@@ -6,20 +6,20 @@ import { motion } from "framer-motion";
 import { ArrowRight, Flame, Timer, Wifi } from "lucide-react";
 
 import { useStore } from "@/lib/store-context";
-import { formatMXN } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { ProductPhoto } from "@/components/product-photo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const ALL_TAG = "Todas";
+const ALL_TAG = "All";
 
-// Vitrina de la línea "Comidas" — platillos reales del catálogo,
+// Vitrina de la línea "Meals" — platillos reales del catálogo,
 // exclusivos de la tienda en línea. Pastillas de filtro funcionales +
 // cuadrícula simple (sin scroll horizontal).
 export function MealsShowcase() {
   const { state } = useStore();
   const meals = useMemo(
-    () => state.products.filter((p) => p.category === "Comidas" && p.mealInfo),
+    () => state.products.filter((p) => p.category === "Meals" && p.mealInfo),
     [state.products]
   );
 
@@ -52,21 +52,21 @@ export function MealsShowcase() {
       >
         <div>
           <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-            Comidas que suman. 🥗
+            Meals that add up. 🥗
             <br />
-            Resultados que se notan.
+            Results you can see.
           </h2>
           <p className="mt-3 max-w-md text-muted-foreground">
-            Platillos preparados, listos en minutos, con sus macros a la vista.{" "}
+            Prepared meals, ready in minutes, with their macros up front.{" "}
             <span className="inline-flex items-center gap-1 font-medium text-foreground">
               <Wifi className="size-4" />
-              Exclusivos de la tienda en línea.
+              Available online only.
             </span>
           </p>
         </div>
-        <Link href="/tienda?categoria=Comidas">
+        <Link href="/plans">
           <Button size="lg" className="gap-2">
-            Explorar comidas
+            Build your meal plan
             <ArrowRight className="size-4" />
           </Button>
         </Link>
@@ -107,7 +107,7 @@ export function MealsShowcase() {
               <ul className="flex flex-col gap-1 text-sm text-muted-foreground">
                 <li className="flex items-center gap-1.5">
                   <Flame className="size-3.5 text-primary" />
-                  {meal.mealInfo?.calories} kcal · {meal.mealInfo?.protein}g proteína
+                  {meal.mealInfo?.calories} kcal · {meal.mealInfo?.protein}g protein
                 </li>
                 <li>{meal.mealInfo?.tags[0]}</li>
                 <li className="flex items-center gap-1.5">
@@ -115,7 +115,7 @@ export function MealsShowcase() {
                   {meal.mealInfo?.minutes} min
                 </li>
               </ul>
-              <p className="mt-1 font-bold text-primary">{formatMXN(meal.price)}</p>
+              <p className="mt-1 font-bold text-primary">{formatMoney(meal.price)}</p>
             </div>
           </div>
         ))}

@@ -3,7 +3,7 @@
 
 export type SalesChannel = "online" | "fisica";
 
-/** Info nutricional, solo presente en productos de la línea "Comidas". */
+/** Info nutricional, solo presente en productos de la línea "Meals". */
 export interface MealInfo {
   calories: number;
   /** Gramos de proteína. */
@@ -26,7 +26,7 @@ export interface Product {
   minStock: number;
   /** Canales donde este producto puede venderse. La mayoría vive en ambos. */
   channels: SalesChannel[];
-  /** Solo presente en platillos preparados ("Comidas"), exclusivos de línea. */
+  /** Solo presente en platillos preparados ("Meals"), exclusivos de línea. */
   mealInfo?: MealInfo;
   /** Término de búsqueda para la foto de stock (Pexels); en inglés da mejores resultados. */
   photoQuery: string;
@@ -50,8 +50,10 @@ export interface Order {
   id: string;
   channel: "online";
   customer: Customer;
-  payment: "Tarjeta";
-  status: "PAGADO";
+  payment: "Card";
+  /** Presente cuando el pedido es el primer envío de un plan de comidas. */
+  subscriptionId?: string;
+  status: "PAID";
   items: SaleItem[];
   total: number;
   ts: number;
@@ -60,7 +62,7 @@ export interface Order {
 export interface Sale {
   id: string;
   channel: "fisica";
-  payment: "Efectivo" | "Tarjeta";
+  payment: "Cash" | "Card";
   cash?: number;
   change?: number;
   items: SaleItem[];
@@ -100,4 +102,26 @@ export interface SellItem {
   name: string;
   price: number;
   qty: number;
+}
+
+export type SubscriptionStatus = "ACTIVE" | "PAUSED" | "CANCELLED";
+
+/** Plan semanal de comidas (flujo tipo suscripción). Solo el primer envío es una venta real. */
+export interface Subscription {
+  id: string;
+  customer: Customer;
+  mealsPerWeek: number;
+  /** Precio por comida congelado al suscribirse. */
+  pricePerMeal: number;
+  preferences: string[];
+  /** Día de entrega, p.ej. "Wednesday". */
+  deliveryDay: string;
+  /** Timestamp de la primera entrega; las siguientes son cada 7 días. */
+  firstDelivery: number;
+  /** Índices de semanas saltadas (0 = primera entrega). */
+  skippedWeeks: number[];
+  status: SubscriptionStatus;
+  /** Pedido online que cobró el primer envío. */
+  firstOrderId: string;
+  ts: number;
 }

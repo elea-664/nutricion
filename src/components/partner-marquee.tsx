@@ -1,8 +1,8 @@
 const PARTNERS = [
   { name: "Iron Temple Gym", emoji: "🏋️" },
   { name: "PowerFit Studio", emoji: "🔥" },
-  { name: "Vita Nutrición", emoji: "🥦" },
-  { name: "CrossBox Reforma", emoji: "🏆" },
+  { name: "Vita Nutrition", emoji: "🥦" },
+  { name: "CrossBox Mesa", emoji: "🏆" },
   { name: "Muscle Lab", emoji: "💪" },
   { name: "Urban Athletics Club", emoji: "🏃" },
   { name: "Recharge Sports Bar", emoji: "🥤" },

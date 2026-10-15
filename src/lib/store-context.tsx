@@ -1,7 +1,7 @@
 "use client";
 
 // Estado global de la demo, montado en el layout raíz (por encima de las rutas)
-// para que sobreviva a la navegación entre Tienda / POS / Admin.
+// para que sobreviva a la navegación entre Shop / Plans / POS / Admin.
 //
 // Regla de oro: una sola fuente de verdad para `stock`. Ambos canales
 // (online y físico) descuentan del mismo arreglo `products` a través de
@@ -23,14 +23,18 @@ import {
   Product,
   Sale,
   SellItem,
+  Subscription,
 } from "./types";
 import { SEED_PRODUCTS } from "./seed";
+import { roundCents } from "./format";
+import { weekdayName } from "./plans";
 
 interface State {
   products: Product[];
   orders: Order[];
   sales: Sale[];
   movements: InventoryMovement[];
+  subscriptions: Subscription[];
 }
 
 function makeInitialState(): State {
@@ -39,13 +43,34 @@ function makeInitialState(): State {
     orders: [],
     sales: [],
     movements: [],
+    subscriptions: [],
   };
 }
 
 type Action =
   | { type: "COMMIT_ONLINE"; order: Order; nextProducts: Product[]; newMovements: InventoryMovement[] }
   | { type: "COMMIT_POS"; sale: Sale; nextProducts: Product[]; newMovements: InventoryMovement[] }
+  | {
+      type: "COMMIT_SUBSCRIPTION";
+      order: Order;
+      subscription: Subscription;
+      nextProducts: Product[];
+      newMovements: InventoryMovement[];
+    }
+  | { type: "UPDATE_SUBSCRIPTION"; id: string; patch: SubscriptionPatch }
   | { type: "RESET" };
+
+type SubscriptionPatch = Partial<Pick<Subscription, "status" | "skippedWeeks">>;
+
+export interface SubscribeInput {
+  customer: Customer;
+  /** Platillos (al precio del plan) + add-ons (a su precio de catálogo). */
+  items: SellItem[];
+  mealsPerWeek: number;
+  pricePerMeal: number;
+  preferences: string[];
+  firstDelivery: number;
+}
 
 /** ¿Hay stock suficiente para vender todos los items pedidos? */
 function hasEnoughStock(products: Product[], items: SellItem[]): boolean {
@@ -56,7 +81,7 @@ function hasEnoughStock(products: Product[], items: SellItem[]): boolean {
 }
 
 /**
- * ¿Todos los items pueden venderse en este canal? La línea "Comidas" es
+ * ¿Todos los items pueden venderse en este canal? La línea "Meals" es
  * exclusiva de la tienda en línea y nunca debe salir por el POS, aunque
  * la UI ya lo filtre — esta es la segunda barrera, en el store.
  */
@@ -118,6 +143,23 @@ function reducer(state: State, action: Action): State {
         movements: [...state.movements, ...action.newMovements],
       };
 
+    case "COMMIT_SUBSCRIPTION":
+      return {
+        ...state,
+        products: action.nextProducts,
+        orders: [...state.orders, action.order],
+        movements: [...state.movements, ...action.newMovements],
+        subscriptions: [...state.subscriptions, action.subscription],
+      };
+
+    case "UPDATE_SUBSCRIPTION":
+      return {
+        ...state,
+        subscriptions: state.subscriptions.map((s) =>
+          s.id === action.id ? { ...s, ...action.patch } : s
+        ),
+      };
+
     case "RESET":
       return makeInitialState();
 
@@ -132,11 +174,18 @@ interface StoreContextValue {
   sellOnline: (customer: Customer, items: SellItem[]) => Order | null;
   /** Devuelve la venta creada, o null si algún item excede el stock disponible. */
   sellPos: (
-    payment: "Efectivo" | "Tarjeta",
+    payment: "Cash" | "Card",
     items: SellItem[],
     cash?: number,
     change?: number
   ) => Sale | null;
+  /**
+   * Crea un plan de comidas: cobra el primer envío como pedido online
+   * (descuenta stock + movimientos) y registra la suscripción, todo en una
+   * sola operación. Devuelve null si algún item excede el stock.
+   */
+  subscribe: (input: SubscribeInput) => { order: Order; subscription: Subscription } | null;
+  updateSubscription: (id: string, patch: SubscriptionPatch) => void;
   reset: () => void;
 }
 
@@ -160,13 +209,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         items,
         "VENTA_ONLINE"
       );
-      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+      const total = roundCents(items.reduce((s, i) => s + i.price * i.qty, 0));
       const order: Order = {
         id: `#${String(126 + state.orders.length).padStart(6, "0")}`,
         channel: "online",
         customer,
-        payment: "Tarjeta",
-        status: "PAGADO",
+        payment: "Card",
+        status: "PAID",
         items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
         total,
         ts: Date.now(),
@@ -179,7 +228,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const sellPos = useCallback(
     (
-      payment: "Efectivo" | "Tarjeta",
+      payment: "Cash" | "Card",
       items: SellItem[],
       cash?: number,
       change?: number
@@ -197,9 +246,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         items,
         "VENTA_FISICA"
       );
-      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+      const total = roundCents(items.reduce((s, i) => s + i.price * i.qty, 0));
       const sale: Sale = {
-        id: `V${String(126 + state.sales.length).padStart(6, "0")}`,
+        id: `S${String(126 + state.sales.length).padStart(6, "0")}`,
         channel: "fisica",
         payment,
         cash,
@@ -214,10 +263,63 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [state.products, state.movements.length, state.sales.length]
   );
 
+  const subscribe = useCallback(
+    (input: SubscribeInput): { order: Order; subscription: Subscription } | null => {
+      const { items } = input;
+      if (
+        items.length === 0 ||
+        !hasEnoughStock(state.products, items) ||
+        !allSellableInChannel(state.products, items, "online")
+      )
+        return null;
+
+      const { nextProducts, newMovements } = applyStockAndMovements(
+        state.products,
+        state.movements.length,
+        items,
+        "VENTA_ONLINE"
+      );
+      const ts = Date.now();
+      const subscriptionId = `SUB-${String(1001 + state.subscriptions.length)}`;
+      const order: Order = {
+        id: `#${String(126 + state.orders.length).padStart(6, "0")}`,
+        channel: "online",
+        customer: input.customer,
+        payment: "Card",
+        subscriptionId,
+        status: "PAID",
+        items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+        total: roundCents(items.reduce((s, i) => s + i.price * i.qty, 0)),
+        ts,
+      };
+      const subscription: Subscription = {
+        id: subscriptionId,
+        customer: input.customer,
+        mealsPerWeek: input.mealsPerWeek,
+        pricePerMeal: input.pricePerMeal,
+        preferences: input.preferences,
+        deliveryDay: weekdayName(input.firstDelivery),
+        firstDelivery: input.firstDelivery,
+        skippedWeeks: [],
+        status: "ACTIVE",
+        firstOrderId: order.id,
+        ts,
+      };
+      dispatch({ type: "COMMIT_SUBSCRIPTION", order, subscription, nextProducts, newMovements });
+      return { order, subscription };
+    },
+    [state.products, state.movements.length, state.orders.length, state.subscriptions.length]
+  );
+
+  const updateSubscription = useCallback(
+    (id: string, patch: SubscriptionPatch) => dispatch({ type: "UPDATE_SUBSCRIPTION", id, patch }),
+    []
+  );
+
   const reset = useCallback(() => dispatch({ type: "RESET" }), []);
 
   return (
-    <StoreContext.Provider value={{ state, sellOnline, sellPos, reset }}>
+    <StoreContext.Provider value={{ state, sellOnline, sellPos, subscribe, updateSubscription, reset }}>
       {children}
     </StoreContext.Provider>
   );
@@ -225,6 +327,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
 export function useStore() {
   const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useStore debe usarse dentro de <StoreProvider>");
+  if (!ctx) throw new Error("useStore must be used within <StoreProvider>");
   return ctx;
 }

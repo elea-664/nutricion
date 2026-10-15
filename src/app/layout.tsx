@@ -14,14 +14,14 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "ATHL8 — Tienda + POS con inventario único",
+  title: "ATHL8 — Sports nutrition selected for performance",
   description:
-    "Demo interactivo de venta de productos de nutrición en dos canales (tienda online y POS) que comparten un mismo inventario.",
+    "Sports nutrition for fueling, hydration, recovery, and performance. Visit ATHL8 in Mesa, AZ or shop online.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${plusJakartaSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${plusJakartaSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           <AppChrome>{children}</AppChrome>

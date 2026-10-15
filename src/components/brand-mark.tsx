@@ -13,7 +13,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
       </div>
       {!compact && (
         <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 text-[0.65rem] font-medium tracking-[0.25em] text-muted-foreground uppercase">
-          Tienda + POS · un inventario
+          Sports nutrition
         </span>
       )}
     </div>

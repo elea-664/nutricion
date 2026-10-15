@@ -6,7 +6,7 @@ export function StockBadge({ product, className }: { product: Product; className
   if (product.stock === 0) {
     return (
       <Badge variant="destructive" className={className}>
-        Agotado
+        Out of stock
       </Badge>
     );
   }
@@ -19,13 +19,13 @@ export function StockBadge({ product, className }: { product: Product; className
           className
         )}
       >
-        Últimas {product.stock}
+        Only {product.stock} left
       </Badge>
     );
   }
   return (
     <Badge variant="secondary" className={className}>
-      En stock
+      In stock
     </Badge>
   );
 }

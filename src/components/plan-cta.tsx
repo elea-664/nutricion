@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 // Banda inspirada en el bloque de "arma tu plan / suscripción" que suele
 // verse en la competencia. Contenido de EJEMPLO: aquí solo enlaza a la
-// línea de Comidas del catálogo — si el cliente ofrece planes o
+// línea de Meals del catálogo — si el cliente ofrece planes o
 // suscripciones reales, esta banda es donde se explicarían y se pediría
 // el copy, precios y fotos correspondientes.
 export function PlanCta() {
@@ -24,22 +24,22 @@ export function PlanCta() {
       >
         <ProductPhoto
           query="meal prep healthy lunch boxes"
-          category="Comidas"
+          category="Meals"
           emoji="🍱"
           emojiClassName="text-7xl"
           className="h-56 w-full sm:h-full"
         />
         <div className="flex flex-col items-start gap-3 p-6 sm:p-8">
           <h3 className="text-2xl font-bold tracking-tight uppercase">
-            ¿No sabes por dónde empezar?
+            Not sure where to start?
           </h3>
           <p className="text-muted-foreground">
-            Arma tu combo ideal desde la línea de Comidas preparadas — o pide asesoría en
-            tienda. Mismo catálogo, mismo stock, sin importar dónde compres.
+            Tell us your goals and how many meals you want each week — we&apos;ll recommend
+            meals that match. Skip, pause or cancel anytime.
           </p>
-          <Link href="/tienda?categoria=Comidas">
+          <Link href="/plans">
             <Button size="lg" className="mt-2 gap-2">
-              Arma tu combo
+              Get started
               <ArrowRight className="size-4" />
             </Button>
           </Link>

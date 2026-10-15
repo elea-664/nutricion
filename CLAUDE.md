@@ -2,6 +2,8 @@
 
 > **Para el agente:** esto es la especificación completa de lo que hay que construir. Léela entera antes de escribir código. Cuando algo no esté definido aquí, prefiere lo **más simple** que cumpla los criterios de aceptación. Esto es un **demo/prototipo clickeable**, no un sistema de producción.
 
+> **Escenario real (prevalece sobre lo de abajo):** la marca es **ATHL8**, tienda de nutrición deportiva en **1455 S Stapley Dr #13, Mesa, AZ 85204** (contacto: hello@athl8nutrition.com). Todo el sitio va **en inglés** y en **USD** (`en-US`, con centavos). Las categorías son **Energy, Hydrate, Protein y Performance**, más la línea **Meals** (platillos preparados, solo en la tienda online); los datos semilla viven en `src/lib/seed.ts` y sustituyen a la tabla de la sección 7. La tienda online está en la ruta **`/shop`** (no `/tienda`). Hay un flujo de **planes de comida semanales** estilo Factor75 en **`/plans`** (plan → entrega → elegir N platillos + add-ons → pago) y su gestión en **`/account`** (saltar semana, pausar, cancelar); solo el primer envío es una venta real que descuenta stock, y las suscripciones viven en el estado global (`subscriptions`). La landing (`/`) combina el copy oficial (hero, las 4 categorías, frase de cierre, "Visit ATHL8", "Get in touch") con secciones de ejemplo traducidas (Meals, plan, testimonios, historia, aliados), cuyo contenido es ficticio.
+
 ---
 
 ## 1. Objetivo

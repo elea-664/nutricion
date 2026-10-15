@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { useStore } from "@/lib/store-context";
-import { formatMXN } from "@/lib/format";
+import { formatMoney, roundCents } from "@/lib/format";
 import { Product } from "@/lib/types";
 import { StockBadge } from "@/components/stock-badge";
 import { ProductPhoto } from "@/components/product-photo";
@@ -28,12 +28,12 @@ interface TicketLine {
   qty: number;
 }
 
-type PaymentMethod = "Efectivo" | "Tarjeta";
+type PaymentMethod = "Cash" | "Card";
 
 export default function PosPage() {
   const { state, sellPos } = useStore();
   const { products } = state;
-  // La línea "Comidas" es exclusiva de la tienda en línea: ni el escaneo
+  // La línea "Meals" es exclusiva de la tienda en línea: ni el escaneo
   // por clic la muestra (el escaneo por código también la rechaza).
   const posProducts = useMemo(
     () => products.filter((p) => p.channels.includes("fisica")),
@@ -42,7 +42,7 @@ export default function PosPage() {
 
   const [ticket, setTicket] = useState<TicketLine[]>([]);
   const [scanValue, setScanValue] = useState("");
-  const [method, setMethod] = useState<PaymentMethod>("Tarjeta");
+  const [method, setMethod] = useState<PaymentMethod>("Card");
   const [cashInput, setCashInput] = useState("");
 
   const scanRef = useRef<HTMLInputElement>(null);
@@ -63,12 +63,14 @@ export default function PosPage() {
     [ticket, products]
   );
 
-  const total = ticketDetailed.reduce((s, { line, product }) => s + product.price * line.qty, 0);
+  const total = roundCents(
+    ticketDetailed.reduce((s, { line, product }) => s + product.price * line.qty, 0)
+  );
   const pieces = ticketDetailed.reduce((s, { line }) => s + line.qty, 0);
 
   const cash = parseFloat(cashInput);
   const cashValid = !Number.isNaN(cash) && cash >= total;
-  const change = cashValid ? cash - total : 0;
+  const change = cashValid ? roundCents(cash - total) : 0;
 
   function qtyInTicket(productId: string) {
     return ticket.find((l) => l.productId === productId)?.qty ?? 0;
@@ -76,11 +78,11 @@ export default function PosPage() {
 
   function addToTicket(product: Product) {
     if (product.stock === 0) {
-      toast.error("Producto agotado", { description: product.name });
+      toast.error("Out of stock", { description: product.name });
       return;
     }
     if (qtyInTicket(product.id) >= product.stock) {
-      toast.error("Sin stock suficiente", { description: product.name });
+      toast.error("Not enough stock", { description: product.name });
       return;
     }
     setTicket((prev) => {
@@ -101,11 +103,11 @@ export default function PosPage() {
       (p) => p.barcode === code || p.sku.toLowerCase() === code.toLowerCase()
     );
     if (!product) {
-      toast.error("Código no reconocido", { description: code });
+      toast.error("Unknown code", { description: code });
       return;
     }
     if (!product.channels.includes("fisica")) {
-      toast.error("Exclusivo de la tienda en línea", { description: product.name });
+      toast.error("Online-only product", { description: product.name });
       return;
     }
     addToTicket(product);
@@ -136,7 +138,7 @@ export default function PosPage() {
 
   function confirmSale() {
     if (ticketDetailed.length === 0) return;
-    if (method === "Efectivo" && !cashValid) return;
+    if (method === "Cash" && !cashValid) return;
 
     const items = ticketDetailed.map(({ line, product }) => ({
       productId: product.id,
@@ -146,20 +148,20 @@ export default function PosPage() {
     }));
 
     const sale =
-      method === "Efectivo"
-        ? sellPos("Efectivo", items, cash, change)
-        : sellPos("Tarjeta", items);
+      method === "Cash"
+        ? sellPos("Cash", items, cash, change)
+        : sellPos("Card", items);
 
     if (sale) {
-      toast.success(`Venta ${sale.id} confirmada`, {
-        description: `${pieces} pieza(s) · ${formatMXN(sale.total)} · ${sale.payment}`,
+      toast.success(`Sale ${sale.id} confirmed`, {
+        description: `${pieces} item(s) · ${formatMoney(sale.total)} · ${sale.payment}`,
       });
       setTicket([]);
       setCashInput("");
       refocusScan();
     } else {
       toast.error("No hay stock suficiente", {
-        description: "El inventario cambió. Ajusta el ticket e intenta de nuevo.",
+        description: "Inventory changed. Adjust the ticket and try again.",
       });
     }
   }
@@ -169,13 +171,13 @@ export default function PosPage() {
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-6 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight">Punto de venta</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Point of sale</h1>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
               Terminal
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Escanea, cobra y confirma — descuenta del mismo inventario que la tienda online.
+            Scan, charge and confirm — sells from the same inventory as the online store.
           </p>
         </div>
 
@@ -190,7 +192,7 @@ export default function PosPage() {
                   autoFocus
                   value={scanValue}
                   onChange={(e) => setScanValue(e.target.value)}
-                  placeholder="Escanea o teclea código de barras / SKU y presiona Enter…"
+                  placeholder="Scan or type a barcode / SKU and press Enter…"
                   className="h-12 pl-10 text-base font-medium"
                 />
               </div>
@@ -220,7 +222,7 @@ export default function PosPage() {
                       <p className="text-sm font-semibold leading-tight">{product.name}</p>
                       <StockBadge product={product} className="shrink-0 text-[0.65rem]" />
                     </div>
-                    <p className="text-sm font-bold text-primary">{formatMXN(product.price)}</p>
+                    <p className="text-sm font-bold text-primary">{formatMoney(product.price)}</p>
                   </div>
                 </button>
               ))}
@@ -236,7 +238,7 @@ export default function PosPage() {
               <CardContent className="px-4">
                 {ticketDetailed.length === 0 ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
-                    Escanea un producto para comenzar.
+                    Scan a product to start.
                   </p>
                 ) : (
                   <ul className="flex flex-col gap-3">
@@ -248,7 +250,7 @@ export default function PosPage() {
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{product.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {formatMXN(product.price)} c/u
+                            {formatMoney(product.price)} each
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
@@ -286,9 +288,9 @@ export default function PosPage() {
 
               <CardContent className="px-4">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-muted-foreground">Total ({pieces} pza)</span>
+                  <span className="text-sm text-muted-foreground">Total ({pieces} items)</span>
                   <span className="text-3xl font-bold tabular-nums">
-                    {formatMXN(total)}
+                    {formatMoney(total)}
                   </span>
                 </div>
               </CardContent>
@@ -299,45 +301,46 @@ export default function PosPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     type="button"
-                    variant={method === "Tarjeta" ? "default" : "outline"}
+                    variant={method === "Card" ? "default" : "outline"}
                     className="gap-2"
-                    onClick={() => setMethod("Tarjeta")}
+                    onClick={() => setMethod("Card")}
                   >
                     <CreditCard className="size-4" />
-                    Tarjeta
+                    Card
                   </Button>
                   <Button
                     type="button"
-                    variant={method === "Efectivo" ? "default" : "outline"}
+                    variant={method === "Cash" ? "default" : "outline"}
                     className="gap-2"
-                    onClick={() => setMethod("Efectivo")}
+                    onClick={() => setMethod("Cash")}
                   >
                     <Banknote className="size-4" />
-                    Efectivo
+                    Cash
                   </Button>
                 </div>
 
-                {method === "Efectivo" && (
+                {method === "Cash" && (
                   <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="cash">Recibido</Label>
+                    <Label htmlFor="cash">Cash received</Label>
                     <Input
                       id="cash"
                       type="number"
                       inputMode="decimal"
                       min={0}
-                      placeholder="0"
+                      step="0.01"
+                      placeholder="0.00"
                       value={cashInput}
                       onChange={(e) => setCashInput(e.target.value)}
                     />
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Cambio</span>
+                      <span className="text-muted-foreground">Change due</span>
                       <span className="font-semibold">
-                        {cashInput ? formatMXN(Math.max(0, change)) : "—"}
+                        {cashInput ? formatMoney(Math.max(0, change)) : "—"}
                       </span>
                     </div>
                     {cashInput && !cashValid && (
                       <p className="text-xs text-destructive">
-                        El monto recibido es menor al total.
+                        Cash received is less than the total.
                       </p>
                     )}
                   </div>
@@ -349,11 +352,11 @@ export default function PosPage() {
                   className="w-full"
                   size="lg"
                   disabled={
-                    ticketDetailed.length === 0 || (method === "Efectivo" && !cashValid)
+                    ticketDetailed.length === 0 || (method === "Cash" && !cashValid)
                   }
                   onClick={confirmSale}
                 >
-                  Confirmar venta · {formatMXN(total)}
+                  Confirm sale · {formatMoney(total)}
                 </Button>
               </CardFooter>
             </Card>

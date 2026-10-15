@@ -56,7 +56,7 @@ export function StockTicker() {
     <div className="border-b bg-muted/40">
       <div className="mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2">
         <span className="shrink-0 text-xs font-medium text-muted-foreground">
-          Stock en vivo
+          Live stock
         </span>
         <div className="flex items-center gap-1.5">
           {state.products.map((p) => {
@@ -73,7 +73,7 @@ export function StockTicker() {
                   !dir && p.stock === 0 && "border-border bg-background text-muted-foreground",
                   !dir && p.stock > 0 && "border-border bg-background"
                 )}
-                title={`${p.name} — ${p.stock} en stock`}
+                title={`${p.name} — ${p.stock} in stock`}
               >
                 <span aria-hidden>{p.emoji}</span>
                 <span className="max-w-24 truncate font-medium">{p.name}</span>

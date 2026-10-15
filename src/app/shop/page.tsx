@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import { useStore } from "@/lib/store-context";
 import { DEFAULT_CUSTOMER, SHIPPING_COST } from "@/lib/seed";
-import { formatMXN } from "@/lib/format";
+import { formatMoney, roundCents } from "@/lib/format";
 import { Product } from "@/lib/types";
 import { StockBadge } from "@/components/stock-badge";
 import { InfoChip } from "@/components/info-chip";
@@ -36,13 +36,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const ALL_CATEGORIES = "Todas";
+const ALL_CATEGORIES = "All";
 
 const customerSchema = z.object({
-  nombre: z.string().min(2, "Ingresa un nombre"),
-  telefono: z.string().min(7, "Ingresa un teléfono válido"),
-  correo: z.email("Correo inválido"),
-  direccion: z.string().min(5, "Ingresa una dirección"),
+  nombre: z.string().min(2, "Enter a name"),
+  telefono: z.string().min(7, "Enter a valid phone number"),
+  correo: z.email("Invalid email"),
+  direccion: z.string().min(5, "Enter an address"),
 });
 type CustomerFormValues = z.infer<typeof customerSchema>;
 
@@ -51,7 +51,7 @@ interface CartLine {
   qty: number;
 }
 
-export default function TiendaPage() {
+export default function ShopPage() {
   const { state, sellOnline } = useStore();
   const { products } = state;
 
@@ -61,15 +61,15 @@ export default function TiendaPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
-  // Permite llegar aquí con una categoría preseleccionada, p.ej. desde el
-  // botón "Explorar comidas" de la home (/tienda?categoria=Comidas).
+  // Permite llegar aquí con una categoría preseleccionada, p.ej. desde las
+  // tarjetas de categoría de la home (/shop?category=Hydrate).
   // `window` no existe en el render de servidor, así que esta sincronización
   // única con la URL solo puede resolverse en un efecto de montaje.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const categoria = params.get("categoria");
+    const fromUrl = params.get("category");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- lectura única de la URL en el montaje, no derivable en el render (SSR sin `window`)
-    if (categoria) setCategory(categoria);
+    if (fromUrl) setCategory(fromUrl);
   }, []);
 
   const form = useForm<CustomerFormValues>({
@@ -105,9 +105,11 @@ export default function TiendaPage() {
     [cart, products]
   );
 
-  const subtotal = cartDetailed.reduce((s, { line, product }) => s + product.price * line.qty, 0);
+  const subtotal = roundCents(
+    cartDetailed.reduce((s, { line, product }) => s + product.price * line.qty, 0)
+  );
   const shipping = cartDetailed.length > 0 ? SHIPPING_COST : 0;
-  const total = subtotal + shipping;
+  const total = roundCents(subtotal + shipping);
 
   function qtyInCart(productId: string) {
     return cart.find((l) => l.productId === productId)?.qty ?? 0;
@@ -159,15 +161,15 @@ export default function TiendaPage() {
     }));
     const order = sellOnline(values, items);
     if (order) {
-      toast.success(`Pedido ${order.id} pagado`, {
-        description: `${items.reduce((s, i) => s + i.qty, 0)} artículo(s) · ${formatMXN(order.total)}`,
+      toast.success(`Order ${order.id} paid`, {
+        description: `${items.reduce((s, i) => s + i.qty, 0)} item(s) · ${formatMoney(order.total)}`,
       });
       setCart([]);
       setCheckoutOpen(false);
       form.reset(DEFAULT_CUSTOMER);
     } else {
-      toast.error("No hay stock suficiente", {
-        description: "Alguien más se llevó existencias. Ajusta tu carrito e intenta de nuevo.",
+      toast.error("Not enough stock", {
+        description: "Someone else just bought some units. Adjust your cart and try again.",
       });
     }
   }
@@ -175,10 +177,10 @@ export default function TiendaPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-6 flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Tienda online</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Online store</h1>
         <p className="text-sm text-muted-foreground">
-          Mismo inventario que el punto de venta físico. La línea Comidas es exclusiva de la
-          tienda en línea.
+          Same inventory as our in-store point of sale in Mesa, AZ. The Meals line is available
+          online only.
         </p>
       </div>
 
@@ -189,7 +191,7 @@ export default function TiendaPage() {
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre, SKU o categoría…"
+                placeholder="Search by name, SKU or category…"
                 className="pl-8"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -240,7 +242,7 @@ export default function TiendaPage() {
                     <button
                       type="button"
                       onClick={() => setDetailProduct(product)}
-                      aria-label={`Ver detalle de ${product.name}`}
+                      aria-label={`View details for ${product.name}`}
                       className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-background/90 text-muted-foreground shadow-sm ring-1 ring-border/60 hover:text-foreground"
                     >
                       <Info className="size-4" />
@@ -255,7 +257,7 @@ export default function TiendaPage() {
                         {!product.channels.includes("fisica") && (
                           <span className="ml-1.5 inline-flex items-center gap-1 text-xs font-medium text-primary">
                             <Wifi className="size-3" />
-                            Solo en línea
+                            Online only
                           </span>
                         )}
                       </p>
@@ -268,7 +270,7 @@ export default function TiendaPage() {
                           {product.mealInfo.calories} kcal
                         </span>
                         <span>•</span>
-                        <span>{product.mealInfo.protein}g proteína</span>
+                        <span>{product.mealInfo.protein}g protein</span>
                         <span>•</span>
                         <span className="inline-flex items-center gap-1">
                           <Timer className="size-3.5" />
@@ -278,7 +280,7 @@ export default function TiendaPage() {
                     )}
 
                     <div className="grid grid-cols-2 gap-2">
-                      <InfoChip label="Precio" value={formatMXN(product.price)} tone="blue" />
+                      <InfoChip label="Price" value={formatMoney(product.price)} tone="blue" />
                       <InfoChip label="SKU" value={product.sku} tone="violet" />
                     </div>
 
@@ -288,7 +290,7 @@ export default function TiendaPage() {
                       onClick={() => addToCart(product)}
                     >
                       <Plus className="size-4" />
-                      {product.stock === 0 ? "Agotado" : atMax ? "Máximo en carrito" : "Agregar"}
+                      {product.stock === 0 ? "Out of stock" : atMax ? "Max in cart" : "Add to cart"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -296,7 +298,7 @@ export default function TiendaPage() {
             })}
             {filtered.length === 0 && (
               <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
-                No se encontraron productos.
+                No products found.
               </p>
             )}
           </div>
@@ -308,13 +310,13 @@ export default function TiendaPage() {
             <CardHeader className="px-4">
               <div className="flex items-center gap-2 font-medium">
                 <ShoppingCart className="size-4" />
-                Tu carrito
+                Your cart
               </div>
             </CardHeader>
             <CardContent className="px-4">
               {cartDetailed.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
-                  Tu carrito está vacío.
+                  Your cart is empty.
                 </p>
               ) : (
                 <ul className="flex flex-col gap-3">
@@ -326,7 +328,7 @@ export default function TiendaPage() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{product.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatMXN(product.price)} c/u
+                          {formatMoney(product.price)} each
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -363,15 +365,15 @@ export default function TiendaPage() {
             <CardContent className="flex flex-col gap-1 px-4 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>{formatMXN(subtotal)}</span>
+                <span>{formatMoney(subtotal)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Envío</span>
-                <span>{shipping > 0 ? formatMXN(shipping) : "—"}</span>
+                <span>Shipping</span>
+                <span>{shipping > 0 ? formatMoney(shipping) : "—"}</span>
               </div>
               <div className="mt-1 flex justify-between text-base font-semibold">
                 <span>Total</span>
-                <span>{formatMXN(total)}</span>
+                <span>{formatMoney(total)}</span>
               </div>
             </CardContent>
             <CardFooter className="px-4">
@@ -380,7 +382,7 @@ export default function TiendaPage() {
                 disabled={cartDetailed.length === 0}
                 onClick={() => setCheckoutOpen(true)}
               >
-                Ir a pagar
+                Checkout
               </Button>
             </CardFooter>
           </Card>
@@ -392,7 +394,7 @@ export default function TiendaPage() {
           <DialogHeader>
             <DialogTitle>Checkout</DialogTitle>
             <DialogDescription>
-              Total a pagar: <span className="font-semibold text-foreground">{formatMXN(total)}</span>
+              Total due: <span className="font-semibold text-foreground">{formatMoney(total)}</span>
             </DialogDescription>
           </DialogHeader>
 
@@ -401,28 +403,28 @@ export default function TiendaPage() {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="nombre">Nombre</Label>
+              <Label htmlFor="nombre">Name</Label>
               <Input id="nombre" {...form.register("nombre")} />
               {form.formState.errors.nombre && (
                 <p className="text-xs text-destructive">{form.formState.errors.nombre.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="telefono">Teléfono</Label>
+              <Label htmlFor="telefono">Phone</Label>
               <Input id="telefono" {...form.register("telefono")} />
               {form.formState.errors.telefono && (
                 <p className="text-xs text-destructive">{form.formState.errors.telefono.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="correo">Correo</Label>
+              <Label htmlFor="correo">Email</Label>
               <Input id="correo" type="email" {...form.register("correo")} />
               {form.formState.errors.correo && (
                 <p className="text-xs text-destructive">{form.formState.errors.correo.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="direccion">Dirección</Label>
+              <Label htmlFor="direccion">Shipping address</Label>
               <Input id="direccion" {...form.register("direccion")} />
               {form.formState.errors.direccion && (
                 <p className="text-xs text-destructive">{form.formState.errors.direccion.message}</p>
@@ -431,7 +433,7 @@ export default function TiendaPage() {
 
             <DialogFooter>
               <Button type="submit" className="gap-2">
-                Pagar con tarjeta · {formatMXN(total)}
+                Pay with card · {formatMoney(total)}
               </Button>
             </DialogFooter>
           </form>
@@ -452,7 +454,7 @@ export default function TiendaPage() {
                   {!detailProduct.channels.includes("fisica") && (
                     <span className="ml-1.5 inline-flex items-center gap-1 font-medium text-primary">
                       <Wifi className="size-3" />
-                      Solo en línea
+                      Online only
                     </span>
                   )}
                 </DialogDescription>
@@ -467,11 +469,11 @@ export default function TiendaPage() {
               />
 
               <div className="grid grid-cols-3 gap-2">
-                <InfoChip label="Precio" value={formatMXN(detailProduct.price)} tone="blue" />
+                <InfoChip label="Price" value={formatMoney(detailProduct.price)} tone="blue" />
                 <InfoChip label="SKU" value={detailProduct.sku} tone="violet" />
                 <InfoChip
                   label="Stock"
-                  value={detailProduct.stock === 0 ? "Agotado" : `${detailProduct.stock} u.`}
+                  value={detailProduct.stock === 0 ? "Out of stock" : `${detailProduct.stock} units`}
                   tone={
                     detailProduct.stock === 0
                       ? "rose"
@@ -485,24 +487,24 @@ export default function TiendaPage() {
               {detailProduct.mealInfo && (
                 <div className="grid grid-cols-3 gap-2">
                   <InfoChip
-                    label="Calorías"
+                    label="Calories"
                     value={`${detailProduct.mealInfo.calories} kcal`}
                     tone="amber"
                   />
                   <InfoChip
-                    label="Proteína"
+                    label="Protein"
                     value={`${detailProduct.mealInfo.protein} g`}
                     tone="emerald"
                   />
-                  <InfoChip label="Listo en" value={`${detailProduct.mealInfo.minutes} min`} tone="blue" />
+                  <InfoChip label="Ready in" value={`${detailProduct.mealInfo.minutes} min`} tone="blue" />
                 </div>
               )}
 
               <p className="text-sm text-muted-foreground">
-                Código de barras {detailProduct.barcode} ·{" "}
+                Barcode {detailProduct.barcode} ·{" "}
                 {detailProduct.channels.includes("fisica")
-                  ? "mismo inventario que el punto de venta físico."
-                  : "exclusivo de la tienda en línea, no disponible en el POS."}
+                  ? "same inventory as our in-store point of sale."
+                  : "available online only, not sold at the in-store POS."}
               </p>
 
               <DialogFooter>
@@ -518,7 +520,7 @@ export default function TiendaPage() {
                   }}
                 >
                   <Plus className="size-4" />
-                  Agregar al carrito
+                  Add to cart
                 </Button>
               </DialogFooter>
             </>

@@ -1,26 +1,29 @@
 # ATHL8
 
-Demo interactivo de venta de productos de nutrición/fitness en **dos canales** —tienda en línea y punto de venta físico (POS)— que comparten **un mismo inventario**.
+**Sports nutrition selected for performance.** Website + interactive demo for ATHL8 (Mesa, AZ): an online store and an in-store point of sale (POS) that share **one single inventory**.
 
-La tesis del demo: vender un producto en un canal baja el stock del otro al instante.
+The core idea: selling a product in one channel lowers its stock in the other instantly.
 
-## Vistas
+## Views
 
-- **`/tienda`** — catálogo, carrito y checkout online (pago simulado).
-- **`/pos`** — punto de venta tipo terminal: escaneo por teclado/clic, ticket, cobro en efectivo (con cambio) o tarjeta.
-- **`/admin`** — dashboard, inventario en vivo, historial de ventas (ambos canales) y movimientos de inventario.
+- **`/`** — ATHL8 landing page: categories (Energy, Hydrate, Protein, Performance), prepared Meals line (online only), athlete stories, our story, partners, store location and contact.
+- **`/shop`** — catalog, cart and online checkout (simulated payment).
+- **`/plans`** — weekly meal plan signup (Factor-style): goals + meals per week → delivery details and day → pick exactly N meals plus optional ATHL8 add-ons → pay. The first box is a real online sale from the shared inventory.
+- **`/account`** — manage meal plans: upcoming deliveries, skip/unskip weeks, pause/resume, cancel.
+- **`/pos`** — terminal-style point of sale: scan by keyboard/click, ticket, cash (with change) or card.
+- **`/admin`** — dashboard, live inventory, unified sales history (both channels), inventory movements and meal plans.
 
-Un ticker de **stock en vivo** en el header refleja los cambios de cualquiera de los dos canales al instante, y un botón de **reiniciar demo** vuelve todo al estado semilla.
+A **live stock** ticker under the header reflects changes from either channel instantly, and a **reset demo** button restores the seed state.
 
 ## Stack
 
-Next.js (App Router) + TypeScript, Tailwind CSS, shadcn/ui, Zod + React Hook Form. Todo el estado (`products`, `orders`, `sales`, `movements`) vive en memoria vía React Context — no hay backend ni base de datos.
+Next.js (App Router) + TypeScript, Tailwind CSS, shadcn/ui, Zod + React Hook Form. All state (`products`, `orders`, `sales`, `movements`) lives in memory via React Context — no backend or database. Prices in USD.
 
-## Correr en local
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
