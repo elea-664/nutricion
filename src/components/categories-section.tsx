@@ -1,188 +1,97 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useRef, type ReactNode } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
-import { ProductPhoto } from "@/components/product-photo";
-
-// Ease-in cúbico a mano (framer-motion no reexporta el suyo desde el
-// paquete principal): arranca lento y acelera hacia el final, para que
-// el mismo tramo de scroll "cueste más" al principio de cada tarjeta y
-// se sienta rápido justo cuando está a punto de terminar de aparecer.
-const easeIn = (t: number) => t * t * t;
-
 interface CategoryCard {
-  /** Nombre de la categoría tal como existe en el catálogo (filtro de /shop). */
+  /** Nombre de la categorÃ­a tal como existe en el catÃ¡logo (filtro de /shop). */
   category: string;
-  title: string;
   description: string;
-  emoji: string;
-  query: string;
+  image: { src: string; alt: string };
 }
 
-// Copy oficial de ATHL8 para las cuatro categorías del catálogo.
+// Copy oficial (resumido) de ATHL8 para las cuatro categorÃ­as. Las fotos
+// son de Pexels (sin marcas), descargadas a /public/images para que no
+// dependan de la API ni cambien solas:
+//   energy      â€” Victor Freitas   https://www.pexels.com/photo/2261481/
+//   hydrate     â€” Ron Lach         https://www.pexels.com/photo/8736751/
+//   protein     â€” Samer Daboul     https://www.pexels.com/photo/1212845/
+//   performance â€” RDNE Stock proj. https://www.pexels.com/photo/8611295/
 const CATEGORIES: CategoryCard[] = [
   {
     category: "Energy",
-    title: "Fuel for every effort",
     description:
-      "Carbs help sustain physical activity, especially during intense or prolonged sessions. Our selection offers snacks, gels, and other energy sources for different stages of training and competition, giving you practical ways to fuel before you start and maintain your pace while you train or compete.",
-    emoji: "⚡",
-    query: "runner energy gel endurance",
+      "Stay fueled before and during training or competition. Explore energy snacks, gels, and carbs to keep you going.",
+    image: { src: "/images/goal-energy.jpg", alt: "Loaded barbell resting on a dark gym floor" },
   },
   {
     category: "Hydrate",
-    title: "Hydration that keeps up with your training",
     description:
-      "Exercise and heat increase the amount of fluid and sodium lost through sweat. Our selection brings together drinks and electrolytes in different formulations to meet hydration demands across sports, conditions, and training durations.",
-    emoji: "💧",
-    query: "athlete drinking water bottle",
+      "Replace fluids and electrolytes lost through sweat. Explore hydration options for every workout, sport, and condition.",
+    image: { src: "/images/goal-hydrate.jpg", alt: "Water bottle on the floor of a boxing gym" },
   },
   {
     category: "Protein",
-    title: "Recovery that supports progress",
     description:
-      "Protein provides the amino acids your muscles need to repair and adapt after exercise. Our selection offers practical ways to add protein to your diet, whether after a training session, between workouts, or on competition day.",
-    emoji: "💪",
-    query: "protein shake gym recovery",
+      "Support muscle repair, growth, and recovery with convenient protein options for training and everyday needs.",
+    image: { src: "/images/goal-protein.jpg", alt: "Spoonful of protein powder over an open tub" },
   },
   {
     category: "Performance",
-    title: "Support for strength, endurance, and recovery",
     description:
-      "Not all supplements have the same level of scientific evidence or serve the same purpose. Our selection is focused on ingredients and products with specific uses in sport to support the demands of strength, high-intensity training, endurance, and competition.",
-    emoji: "🏋️",
-    query: "athlete strength training gym",
+      "Targeted ingredients that work alongside your training and nutrition to support strength, endurance, and recovery.",
+    image: { src: "/images/goal-performance.jpg", alt: "Row of kettlebells on a gym floor" },
   },
 ];
 
-function CardInner({ item }: { item: CategoryCard }) {
-  return (
-    <>
-      <span className="text-xs font-bold tracking-[0.3em] text-primary uppercase">
-        {item.category}
-      </span>
-      <h3 className="text-xl font-bold text-white">{item.title}</h3>
-      <p className="text-sm leading-relaxed text-white/75">{item.description}</p>
-      <span className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/50 px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase transition-colors group-hover:border-white group-hover:bg-white group-hover:text-black">
-        Shop {item.category}
-        <ArrowRight className="size-3.5" />
-      </span>
-    </>
-  );
-}
-
-function CardShell({ item, children }: { item: CategoryCard; children: ReactNode }) {
-  return (
-    <Link
-      href={`/shop?category=${encodeURIComponent(item.category)}`}
-      className="group relative flex h-full min-h-112 flex-col justify-end overflow-hidden rounded-2xl border border-border"
-    >
-      <ProductPhoto
-        query={item.query}
-        category={item.category}
-        emoji={item.emoji}
-        emojiClassName="text-7xl"
-        className="absolute inset-0 h-full w-full transition-transform duration-500 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/55 to-black/10" />
-      {children}
-    </Link>
-  );
-}
-
-// Animación en dos tiempos atada al scroll de la sección: primero la
-// tarjeta sube y aparece despacio (curva ease-in); ya casi colocada, el
-// texto de adentro se asienta en una ráfaga corta. Cada tarjeta arranca
-// un poco después que la anterior (stagger) dentro del mismo scroll.
-function AnimatedCard({
-  item,
-  index,
-  progress,
-}: {
-  item: CategoryCard;
-  index: number;
-  progress: MotionValue<number>;
-}) {
-  const start = index * 0.1;
-  const cardY = useTransform(progress, [start, start + 0.55], [110, 0], { ease: easeIn });
-  const cardOpacity = useTransform(progress, [start, start + 0.55], [0, 1], { ease: easeIn });
-  const infoY = useTransform(progress, [start + 0.42, start + 0.6], [14, 0]);
-  const infoOpacity = useTransform(progress, [start + 0.42, start + 0.6], [0, 1]);
-
-  return (
-    <motion.div style={{ y: cardY, opacity: cardOpacity }} className="h-full">
-      <CardShell item={item}>
-        <motion.div
-          style={{ y: infoY, opacity: infoOpacity }}
-          className="relative flex flex-col gap-2 p-5"
-        >
-          <CardInner item={item} />
-        </motion.div>
-      </CardShell>
-    </motion.div>
-  );
-}
-
-// Las cuatro categorías de ATHL8 como tarjetas grandes que enlazan
-// directo a /shop ya filtrado. Usa el mismo mecanismo de fotos (Pexels +
-// fallback a emoji) que el catálogo, así que no rompe sin API key.
+// "Shop by your goal": foto limpia arriba y nombre + descripciÃ³n abajo,
+// cada tarjeta enlaza a /shop ya filtrado. Va pegada a la franja de
+// cifras bajo el hero, asÃ­ que se anima al entrar en viewport (no atada
+// al scroll) para que no arranque a medio aparecer si ya estÃ¡ a la vista.
 export function CategoriesSection() {
-  // El ref va en la sección completa para que el progreso 1 caiga justo
-  // cuando su borde superior llega arriba de la pantalla.
-  const sectionRef = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "start start"],
-  });
-
   return (
-    <section
-      id="categories"
-      ref={sectionRef}
-      className="flex min-h-[calc(100vh-4rem)] flex-col justify-center border-t border-border bg-background px-4 py-24"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5 }}
-        className="mx-auto mb-12 max-w-2xl text-center"
-      >
-        <h2 className="text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-          Shop by category
+    <section id="products" className="scroll-mt-16 bg-background px-4 pt-12 pb-24">
+      <div className="mx-auto w-full max-w-6xl">
+        <h2 className="mb-6 font-display text-3xl font-extrabold tracking-tight uppercase sm:text-4xl">
+          Shop by your <span className="text-primary">goal</span>
         </h2>
-        <p className="mt-3 text-muted-foreground">
-          Fueling, hydration, recovery, and performance — all in one place.
-        </p>
-      </motion.div>
 
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {CATEGORIES.map((item, i) =>
-          shouldReduceMotion ? (
-            <CardShell key={item.category} item={item}>
-              <div className="relative flex flex-col gap-2 p-5">
-                <CardInner item={item} />
-              </div>
-            </CardShell>
-          ) : (
-            <AnimatedCard
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CATEGORIES.map((item, i) => (
+            <motion.div
               key={item.category}
-              item={item}
-              index={i}
-              progress={scrollYProgress}
-            />
-          )
-        )}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, delay: i * 0.08 }}
+              className="h-full"
+            >
+              <Link
+                href={`/shop?category=${encodeURIComponent(item.category)}`}
+                className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/60"
+              >
+                <div className="relative aspect-4/3 overflow-hidden">
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col gap-2 p-5">
+                  <h3 className="flex items-center justify-between gap-2 font-display text-xl font-extrabold tracking-tight uppercase">
+                    {item.category}
+                    <ArrowRight className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

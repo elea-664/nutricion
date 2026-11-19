@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store-context";
 import { AppChrome } from "@/components/app-chrome";
@@ -13,6 +13,15 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+// Fuente "display" para titulares grandes del inicio (hero, cifras,
+// "Shop by your goal"), en prueba por el mockup del cliente: más
+// condensada y pesada que la sans base. Se usa con la clase font-display.
+const montserrat = Montserrat({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: "ATHL8 — Sports nutrition selected for performance",
   description:
@@ -21,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${plusJakartaSans.variable} ${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           <AppChrome>{children}</AppChrome>
